@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react"; // Keep useActionState from 'react'
+import { useFormStatus } from "react-dom"; // Import useFormStatus from 'react-dom'
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { PromptSuggestions } from "@/components/prompt-suggestions";
 import { LivePreview } from "@/components/live-preview";
 import { Wand2, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import JSZip from 'jszip'; // Import JSZip directly
 
 const initialState = {
   message: null,
@@ -37,25 +39,28 @@ function SubmitButton() {
 }
 
 function DownloadButton({ code }: { code: { html: string, css: string, javascript: string } | null | undefined }) {
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!code) return;
 
-    const zip = new (require('jszip'))(); // Lazy load jszip
+    const zip = new JSZip(); // Use imported JSZip
 
     zip.file("index.html", code.html);
     zip.file("style.css", code.css);
     zip.file("script.js", code.javascript);
 
-    zip.generateAsync({ type: "blob" })
-      .then(function (content: Blob) {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(content);
-        link.download = "website.zip";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-      });
+    try {
+      const content = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = "website.zip";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("Error creating zip file:", error);
+      // Optionally show a toast message for the error
+    }
   };
 
   if (!code?.html) return null;
@@ -69,7 +74,7 @@ function DownloadButton({ code }: { code: { html: string, css: string, javascrip
 
 
 export default function Home() {
-  const [state, formAction] = useFormState(generateWebsiteAction, initialState);
+  const [state, formAction] = useActionState(generateWebsiteAction, initialState);
   const [promptValue, setPromptValue] = React.useState("");
   const [showSuggestions, setShowSuggestions] = React.useState(false);
   const { toast } = useToast();
