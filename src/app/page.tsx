@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useActionState } from "react"; // Keep useActionState from 'react'
-import { useFormStatus } from "react-dom"; // Import useFormStatus from 'react-dom'
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { PromptSuggestions } from "@/components/prompt-suggestions";
 import { LivePreview } from "@/components/live-preview";
 import { Wand2, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import JSZip from 'jszip'; // Import JSZip directly
+import JSZip from 'jszip';
 
 const initialState = {
   message: null,
@@ -24,7 +24,7 @@ const initialState = {
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} aria-disabled={pending}>
+    <Button type="submit" disabled={pending} aria-disabled={pending} className="w-full sm:w-auto">
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
@@ -42,7 +42,7 @@ function DownloadButton({ code }: { code: { html: string, css: string, javascrip
   const handleDownload = async () => {
     if (!code) return;
 
-    const zip = new JSZip(); // Use imported JSZip
+    const zip = new JSZip();
 
     zip.file("index.html", code.html);
     zip.file("style.css", code.css);
@@ -66,7 +66,7 @@ function DownloadButton({ code }: { code: { html: string, css: string, javascrip
   if (!code?.html) return null;
 
   return (
-    <Button variant="outline" onClick={handleDownload}>
+    <Button variant="outline" onClick={handleDownload} className="w-full sm:w-auto">
       <Download className="mr-2 h-4 w-4" /> Download Code
     </Button>
   );
@@ -93,7 +93,7 @@ export default function Home() {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPromptValue(event.target.value);
-    setShowSuggestions(true);
+    setShowSuggestions(event.target.value.length > 0); // Show suggestions only if there's input
   };
 
   const handleSelectSuggestion = (suggestion: string) => {
@@ -116,46 +116,48 @@ export default function Home() {
 
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background">
+    <div className="flex flex-col md:flex-row min-h-screen bg-background">
       {/* Left Panel: Prompt Input */}
-      <div className="w-full md:w-1/2 h-1/2 md:h-full p-4 lg:p-6 flex flex-col border-r border-border">
+      <div className="w-full md:w-1/2 md:max-h-screen p-4 md:p-6 flex flex-col border-r border-border">
          <Card className="flex flex-col flex-grow overflow-hidden shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wand2 className="h-6 w-6 text-primary" />
+          <CardHeader className="flex-shrink-0">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl">
+              <Wand2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               PromptToSite
             </CardTitle>
             <CardDescription>Describe the website you want to create.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col flex-grow gap-4 overflow-hidden">
+          <CardContent className="flex flex-col flex-grow gap-4 overflow-y-auto p-4 md:p-6 pt-0">
            <form action={formAction} ref={formRef} className="flex flex-col flex-grow gap-4">
              <div className="flex flex-col flex-grow gap-1.5 relative">
                 <Label htmlFor="prompt">Your Prompt</Label>
-                 <Textarea
-                  id="prompt"
-                  name="prompt"
-                  placeholder="e.g., Create a simple portfolio website for a photographer..."
-                  className="flex-grow resize-none text-base" // Ensure text area grows
-                  rows={10} // Start with a reasonable number of rows
-                  value={promptValue}
-                  onChange={handleInputChange}
-                  onFocus={handleTextareaFocus}
-                  onBlur={handleTextareaBlur}
-                  aria-describedby="prompt-error"
-                  required
-                />
-                <PromptSuggestions
-                  inputValue={promptValue}
-                  onSelectSuggestion={handleSelectSuggestion}
-                  isVisible={showSuggestions}
-                />
+                <div className="relative flex-grow">
+                   <Textarea
+                    id="prompt"
+                    name="prompt"
+                    placeholder="e.g., Create a simple portfolio website for a photographer..."
+                    className="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] w-full resize-none text-sm sm:text-base" // Ensure text area grows
+                    value={promptValue}
+                    onChange={handleInputChange}
+                    onFocus={handleTextareaFocus}
+                    onBlur={handleTextareaBlur}
+                    aria-describedby="prompt-error"
+                    required
+                  />
+                  <PromptSuggestions
+                    inputValue={promptValue}
+                    onSelectSuggestion={handleSelectSuggestion}
+                    isVisible={showSuggestions}
+                  />
+                 </div>
                  {state?.errors?.prompt && (
                     <p id="prompt-error" className="text-sm font-medium text-destructive">
                         {state.errors.prompt[0]}
                     </p>
                  )}
               </div>
-              <div className="flex flex-wrap gap-2 justify-start items-center mt-auto pt-4 border-t border-border">
+              {/* Buttons container at the bottom */}
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 justify-start items-center mt-auto pt-4 border-t border-border flex-shrink-0">
                 <SubmitButton />
                 <DownloadButton code={state?.code}/>
               </div>
@@ -165,22 +167,24 @@ export default function Home() {
       </div>
 
       {/* Right Panel: Live Preview */}
-      <div className="w-full md:w-1/2 h-1/2 md:h-full p-4 lg:p-6 flex">
-        <ScrollArea className="w-full h-full rounded-lg border bg-card">
-          <div className="p-1"> {/* Added padding around preview area */}
+      <div className="w-full md:w-1/2 md:max-h-screen p-4 md:p-6 flex">
+        {/* Ensure ScrollArea takes full height of its container */}
+        <ScrollArea className="w-full h-full rounded-lg border bg-card shadow-inner">
+           {/* Use flexbox to manage preview/placeholder height */}
+           <div className="flex flex-col h-full p-1">
               {state?.code ? (
                   <LivePreview
-                  html={state.code.html}
-                  css={state.code.css}
-                  javascript={state.code.javascript}
-                  className="min-h-[400px] md:min-h-full" // Ensure minimum height
+                    html={state.code.html}
+                    css={state.code.css}
+                    javascript={state.code.javascript}
+                    className="flex-grow w-full" // Allow preview to grow
                   />
               ) : (
-                <div className="flex items-center justify-center h-[400px] md:h-full text-muted-foreground text-center p-4">
+                <div className="flex flex-grow items-center justify-center text-muted-foreground text-center p-4">
                     <p>Your generated website preview will appear here.</p>
                 </div>
              )}
-          </div>
+           </div>
         </ScrollArea>
       </div>
     </div>
