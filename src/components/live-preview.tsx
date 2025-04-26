@@ -1,6 +1,7 @@
+
 "use client";
 
-import * as React from "react"; // Added explicit React import
+import React from "react";
 import { cn } from "@/lib/utils";
 
 interface LivePreviewProps {
@@ -29,7 +30,7 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
       </head>
       <body>
         ${html}
-        <script>${javascript}<\/script>
+        <script>${javascript}<\/script> {# Escaping forward slash in script tag for safety #}
       </body>
       </html>
     `;
@@ -44,7 +45,7 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
         title="Live Preview"
         className="w-full h-full border-0 bg-transparent" // Added bg-transparent
         sandbox="allow-scripts allow-same-origin" // Allow scripts but restrict some potentially harmful actions
-        allowTransparency={true} // Explicitly allow transparency
+        allowtransparency="true" // Changed to lowercase as suggested by React warning
       />
     </div>
   );
