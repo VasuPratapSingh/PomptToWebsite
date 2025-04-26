@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useActionState } from "react"; // Use react's useActionState
+import { useActionState } from "react"; // Import useActionState from react
 import { useFormStatus } from "react-dom"; // Keep useFormStatus from react-dom
 import { motion, AnimatePresence } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,15 +12,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { generateWebsiteAction } from "./actions";
+// Removed import { default_api } from "@/lib/edge-api";
 import { PromptSuggestions } from "@/components/prompt-suggestions";
 import { LivePreview } from "@/components/live-preview";
 import { ChatBot } from "@/components/chat-bot";
 import { Wand2, Download, Loader2, Sparkles, Mic, MicOff, Maximize, Minimize } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import { cn } from "@/lib/utils";
 import { promptExamples } from "@/lib/prompt-examples";
+// Removed import { listProjectFiles } from "@/lib/utils";
 
 
 const initialState = {
@@ -84,21 +86,30 @@ function SubmitButton() {
 }
 
 function DownloadButton({ code }: { code: { html: string, css: string, javascript: string } | null | undefined }) {
-  const handleDownload = async () => {
-    if (!code) return;
+  const handleDownload = async (): Promise<void> => {
+    if (!code?.html) {
+        console.warn("No code found to download.");
+        // Optionally, show a toast notification
+        // toast({ title: "Nothing to Download", description: "Generate a website first.", variant: "destructive" });
+        return;
+    }
 
     const zip = new JSZip();
-    zip.file("index.html", code.html || "");
-    zip.file("style.css", code.css || "");
-    zip.file("script.js", code.javascript || "");
+    // Add generated files to the zip
+    zip.file("index.html", code.html);
+    zip.file("style.css", code.css);
+    zip.file("script.js", code.javascript);
 
     try {
       const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, "website.zip"); // Use file-saver's saveAs
+      saveAs(content, "generated-website.zip"); // Use file-saver's saveAs
     } catch (error) {
       console.error("Error creating zip file:", error);
+      // Optionally, show an error toast
+      // toast({ title: "Download Failed", description: "Could not create ZIP file.", variant: "destructive" });
     }
   };
+
 
   return (
     <AnimatePresence>
@@ -562,3 +573,4 @@ export default function Home() {
     </div>
   );
 }
+
