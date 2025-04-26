@@ -1,9 +1,10 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef, useActionState } from "react";
-import { useFormStatus } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { useActionState } from "react"; // Import useActionState from react
+import { useFormStatus } from "react-dom"; // Keep useFormStatus from react-dom
+import { motion, AnimatePresence } from "framer-motion"; // Import framer-motion
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -13,9 +14,10 @@ import { generateWebsiteAction } from "./actions";
 import { PromptSuggestions } from "@/components/prompt-suggestions";
 import { LivePreview } from "@/components/live-preview";
 import { ChatBot } from "@/components/chat-bot";
-import { Wand2, Download, Loader2, Sparkles, Mic, MicOff } from "lucide-react"; // Added Mic, MicOff
+import { Wand2, Download, Loader2, Sparkles, Mic, MicOff, Maximize, Minimize } from "lucide-react"; // Added Maximize, Minimize
 import { useToast } from "@/hooks/use-toast";
 import JSZip from 'jszip';
+import { saveAs } from 'file-saver'; // Import file-saver for download
 import { cn } from "@/lib/utils";
 import { promptExamples } from "@/lib/prompt-examples";
 
@@ -91,13 +93,7 @@ function DownloadButton({ code }: { code: { html: string, css: string, javascrip
 
     try {
       const content = await zip.generateAsync({ type: "blob" });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = "website.zip";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      saveAs(content, "website.zip"); // Use file-saver's saveAs
     } catch (error) {
       console.error("Error creating zip file:", error);
     }
@@ -148,6 +144,7 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [speechApiSupported, setSpeechApiSupported] = useState(false);
+  const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false); // State for fullscreen preview
 
   useEffect(() => {
       // Check for SpeechRecognition API support on component mount
@@ -218,6 +215,22 @@ export default function Home() {
           }
       };
   }, [toast, isRecording]); // Re-run effect if toast or isRecording changes (though isRecording dependency is mainly for onend logic)
+
+
+   // Handle Escape key to exit fullscreen
+   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isPreviewFullscreen) {
+        setIsPreviewFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isPreviewFullscreen]);
+
 
   const handleToggleRecording = () => {
       if (!speechApiSupported) {
@@ -293,209 +306,257 @@ export default function Home() {
     setTimeout(() => setShowSuggestions(false), 150);
   }
 
+  const toggleFullscreenPreview = () => {
+      setIsPreviewFullscreen(!isPreviewFullscreen);
+  }
+
 
   return (
-    <div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
-      {/* Left Panel: Prompt Input */}
-      <ScrollArea className="w-full md:w-1/2 md:max-h-screen">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col min-h-full"
-        >
-           <motion.div
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 0.4, delay: 0.1 }}
-             className="flex flex-col flex-grow" // Ensure this div grows
-           >
-            <Card className="flex flex-col flex-grow overflow-hidden shadow-lg rounded-xl backdrop-blur-md bg-card/70 border border-border/50 transition-all duration-300 hover:shadow-xl">
-                <CardHeader className="flex-shrink-0 pb-4">
-                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl md:text-3xl font-bold">
+    <div className={cn(
+        "relative flex flex-col md:flex-row min-h-screen overflow-hidden transition-all duration-300 ease-in-out",
+        isPreviewFullscreen ? "bg-background" : "" // Adjust background for fullscreen
+    )}>
+        {/* Left Panel: Prompt Input */}
+        <AnimatePresence>
+        {!isPreviewFullscreen && (
+            <motion.div
+                initial={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50, transition: { duration: 0.3 } }}
+                className="w-full md:w-1/2 md:max-h-screen"
+            >
+                <ScrollArea className="h-full">
                     <motion.div
-                        animate={{ rotate: [0, 15, -10, 15, 0], scale: [1, 1.1, 1, 1.1, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror", delay: 0.5 }} // Added delay
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col min-h-full"
                     >
-                        <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    </motion.div>
-                    PromptToSite
-                </CardTitle>
-                <CardDescription className="text-sm sm:text-base md:text-lg">Describe the website you want to create, or try a preset.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col flex-grow gap-4 p-4 md:p-6 pt-0">
-                <form action={formAction} ref={formRef} className="flex flex-col flex-grow gap-4">
-                    <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                    className="flex flex-col flex-grow gap-1.5 relative"
-                    >
-                    <Label htmlFor="prompt" className="text-md sm:text-lg font-semibold">Your Prompt</Label>
-                    <div className="relative flex-grow flex items-start"> {/* Use flex to align items */}
-                        <Textarea
-                        id="prompt"
-                        name="prompt"
-                        placeholder="e.g., Create a sleek landing page for a mobile app promoting sustainable travel..."
-                        className="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] flex-grow resize-none text-base rounded-lg shadow-inner bg-input/80 backdrop-blur-sm transition-shadow focus:shadow-md focus:ring-2 focus:ring-ring/50 pr-12" // Added padding-right for mic button
-                        value={promptValue}
-                        onChange={handleInputChange}
-                        onFocus={handleTextareaFocus}
-                        onBlur={handleTextareaBlur}
-                        aria-describedby="prompt-error"
-                        required
-                        />
-                        {/* Voice Input Button */}
-                        {speechApiSupported && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.5 }}
-                                className="absolute top-2 right-2" // Position top-right
-                            >
-                                <Button
-                                    type="button"
-                                    variant={isRecording ? "destructive" : "ghost"}
-                                    size="icon"
-                                    onClick={handleToggleRecording}
-                                    className={cn(
-                                        "rounded-full transition-colors duration-200",
-                                        isRecording ? "bg-red-500/80 hover:bg-red-600/80 text-white animate-pulse" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                                    )}
-                                    aria-label={isRecording ? "Stop recording" : "Start recording"}
-                                >
-                                    {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                                </Button>
-                            </motion.div>
-                        )}
-                        <AnimatePresence>
-                        {showSuggestions && (
-                            <motion.div
-                            initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute z-10 mt-1 w-full top-full" // Position below textarea
-                            style={{ maxWidth: 'calc(100% - 2rem)' }} // Prevent overflow on smaller screens
-                            >
-                            <PromptSuggestions
-                                inputValue={promptValue}
-                                onSelectSuggestion={handleSelectSuggestion}
-                                isVisible={showSuggestions}
-                            />
-                            </motion.div>
-                        )}
-                        </AnimatePresence>
-                    </div>
-                    {state?.errors?.prompt && (
-                        <motion.p
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            id="prompt-error"
-                            className="text-sm font-medium text-destructive"
-                        >
-                            {state.errors.prompt[0]}
-                        </motion.p>
-                    )}
-                    </motion.div>
-
-                    {/* Preset Prompts Section */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.3 }}
-                        className="mt-4 flex-shrink-0"
-                    >
-                    <Label className="text-sm sm:text-base font-medium mb-2 block">Try these examples:</Label>
-                    <div className="flex flex-wrap gap-2">
-                        {promptExamples.map((example, index) => (
                         <motion.div
-                            key={index}
-                            whileHover={{ scale: 1.05, y: -1, boxShadow: "0px 3px 10px hsla(var(--foreground)/0.1)" }}
-                            whileTap={{ scale: 0.95, y: 0, boxShadow: "0px 1px 5px hsla(var(--foreground)/0.05)" }}
-                            transition={{ type: "spring", stiffness: 400, damping: 17, delay: 0.1 * index }} // Staggered delay
-                            className="animate-in fade-in slide-in-from-bottom-2 duration-300" // Added simple entrance animation
-                            style={{ animationDelay: `${index * 50}ms` }} // Staggered delay for entrance
-                         >
-                            <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePresetClick(example)}
-                            className="transition-all duration-150 ease-in-out text-xs sm:text-sm shadow-sm hover:shadow backdrop-blur-sm bg-background/60 hover:bg-accent/20" // Hover effect
-                            aria-label={`Use preset prompt: ${example}`}
-                            >
-                            {example.length > 40 ? `${example.substring(0, 37)}...` : example}
-                            </Button>
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.4, delay: 0.1 }}
+                            className="flex flex-col flex-grow" // Ensure this div grows
+                        >
+                            <Card className="flex flex-col flex-grow overflow-hidden shadow-lg rounded-xl backdrop-blur-md bg-card/70 border border-border/50 transition-all duration-300 hover:shadow-xl">
+                                <CardHeader className="flex-shrink-0 pb-4">
+                                    <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl md:text-3xl font-bold">
+                                        <motion.div
+                                            animate={{ rotate: [0, 15, -10, 15, 0], scale: [1, 1.1, 1, 1.1, 1] }}
+                                            transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror", delay: 0.5 }} // Added delay
+                                        >
+                                            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                                        </motion.div>
+                                        PromptToSite
+                                    </CardTitle>
+                                    <CardDescription className="text-sm sm:text-base md:text-lg">Describe the website you want to create, or try a preset.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex flex-col flex-grow gap-4 p-4 md:p-6 pt-0">
+                                    <form action={formAction} ref={formRef} className="flex flex-col flex-grow gap-4">
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.3, delay: 0.2 }}
+                                            className="flex flex-col flex-grow gap-1.5 relative"
+                                        >
+                                            <Label htmlFor="prompt" className="text-md sm:text-lg font-semibold">Your Prompt</Label>
+                                            <div className="relative flex-grow flex items-start"> {/* Use flex to align items */}
+                                                <Textarea
+                                                    id="prompt"
+                                                    name="prompt"
+                                                    placeholder="e.g., Create a sleek landing page for a mobile app promoting sustainable travel..."
+                                                    className="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] flex-grow resize-none text-base rounded-lg shadow-inner bg-input/80 backdrop-blur-sm transition-shadow focus:shadow-md focus:ring-2 focus:ring-ring/50 pr-12" // Added padding-right for mic button
+                                                    value={promptValue}
+                                                    onChange={handleInputChange}
+                                                    onFocus={handleTextareaFocus}
+                                                    onBlur={handleTextareaBlur}
+                                                    aria-describedby="prompt-error"
+                                                    required
+                                                />
+                                                {/* Voice Input Button */}
+                                                {speechApiSupported && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, scale: 0.8 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        transition={{ delay: 0.5 }}
+                                                        className="absolute top-2 right-2" // Position top-right
+                                                    >
+                                                        <Button
+                                                            type="button"
+                                                            variant={isRecording ? "destructive" : "ghost"}
+                                                            size="icon"
+                                                            onClick={handleToggleRecording}
+                                                            className={cn(
+                                                                "rounded-full transition-colors duration-200",
+                                                                isRecording ? "bg-red-500/80 hover:bg-red-600/80 text-white animate-pulse" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                                                            )}
+                                                            aria-label={isRecording ? "Stop recording" : "Start recording"}
+                                                        >
+                                                            {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                                                        </Button>
+                                                    </motion.div>
+                                                )}
+                                                <AnimatePresence>
+                                                    {showSuggestions && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                                                            transition={{ duration: 0.2 }}
+                                                            className="absolute z-10 mt-1 w-full top-full" // Position below textarea
+                                                            style={{ maxWidth: 'calc(100% - 2rem)' }} // Prevent overflow on smaller screens
+                                                        >
+                                                            <PromptSuggestions
+                                                                inputValue={promptValue}
+                                                                onSelectSuggestion={handleSelectSuggestion}
+                                                                isVisible={showSuggestions}
+                                                            />
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                            {state?.errors?.prompt && (
+                                                <motion.p
+                                                    initial={{ opacity: 0, y: 5 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    id="prompt-error"
+                                                    className="text-sm font-medium text-destructive"
+                                                >
+                                                    {state.errors.prompt[0]}
+                                                </motion.p>
+                                            )}
+                                        </motion.div>
+
+                                        {/* Preset Prompts Section */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.3, delay: 0.3 }}
+                                            className="mt-4 flex-shrink-0"
+                                        >
+                                            <Label className="text-sm sm:text-base font-medium mb-2 block">Try these examples:</Label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {promptExamples.map((example, index) => (
+                                                    <motion.div
+                                                        key={index}
+                                                        whileHover={{ scale: 1.05, y: -1, boxShadow: "0px 3px 10px hsla(var(--foreground)/0.1)" }}
+                                                        whileTap={{ scale: 0.95, y: 0, boxShadow: "0px 1px 5px hsla(var(--foreground)/0.05)" }}
+                                                        transition={{ type: "spring", stiffness: 400, damping: 17, delay: 0.1 * index }} // Staggered delay
+                                                        className="animate-in fade-in slide-in-from-bottom-2 duration-300" // Added simple entrance animation
+                                                        style={{ animationDelay: `${index * 50}ms` }} // Staggered delay for entrance
+                                                    >
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handlePresetClick(example)}
+                                                            className="transition-all duration-150 ease-in-out text-xs sm:text-sm shadow-sm hover:shadow backdrop-blur-sm bg-background/60 hover:bg-accent/20" // Hover effect
+                                                            aria-label={`Use preset prompt: ${example}`}
+                                                        >
+                                                            {example.length > 40 ? `${example.substring(0, 37)}...` : example}
+                                                        </Button>
+                                                    </motion.div>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+
+                                        {/* Buttons container at the bottom */}
+                                        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-start items-center mt-auto pt-4 border-t border-border/50 flex-shrink-0">
+                                            <SubmitButton />
+                                            <DownloadButton code={state?.code} />
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
                         </motion.div>
-                        ))}
-                    </div>
                     </motion.div>
+                </ScrollArea>
+            </motion.div>
+        )}
+        </AnimatePresence>
 
-                    {/* Buttons container at the bottom */}
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-start items-center mt-auto pt-4 border-t border-border/50 flex-shrink-0">
-                       <SubmitButton />
-                       <DownloadButton code={state?.code}/>
-                    </div>
-                </form>
-                </CardContent>
-            </Card>
-           </motion.div>
-        </motion.div>
-      </ScrollArea>
 
-      {/* Right Panel: Live Preview */}
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-        className="w-full md:w-1/2 md:max-h-screen p-4 sm:p-6 md:p-8 lg:p-10 flex"
-       >
-        <ScrollArea className="w-full h-full rounded-xl border border-border/50 bg-card/60 backdrop-blur-md shadow-inner transition-shadow hover:shadow-lg">
-           <div className="flex flex-col h-full p-1">
-             <AnimatePresence mode="wait">
-               {state?.code ? (
-                 <motion.div
-                   key={previewKey}
-                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                   transition={{ duration: 0.4, ease: "easeOut" }}
-                   className="h-full"
-                 >
-                   <LivePreview
-                     html={state.code.html}
-                     css={state.code.css}
-                     javascript={state.code.javascript}
-                     className="flex-grow w-full bg-transparent"
-                   />
-                 </motion.div>
-               ) : (
-                 <motion.div
-                   key="placeholder"
-                   initial={{ opacity: 0, y: 10 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   exit={{ opacity: 0, y: -10 }}
-                   transition={{ duration: 0.3 }}
-                   className="flex flex-grow items-center justify-center text-muted-foreground text-center p-4"
-                 >
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: [0.8, 1.05, 1], opacity: 1 }}
-                        transition={{ duration: 0.7, ease: 'backOut', delay: 0.5 }} // Added delay
-                        className="flex flex-col items-center gap-2"
+        {/* Right Panel: Live Preview */}
+         <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut", delay: isPreviewFullscreen ? 0 : 0.2 }} // Adjust delay based on fullscreen
+                className={cn(
+                    "w-full md:max-h-screen flex flex-col relative transition-all duration-300 ease-in-out",
+                    isPreviewFullscreen ? "md:w-full fixed inset-0 z-40 p-0" : "md:w-1/2 p-4 sm:p-6 md:p-8 lg:p-10"
+                )}
+            >
+             {/* Fullscreen Toggle Button */}
+              <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className={cn(
+                        "absolute top-6 right-6 z-50",
+                        isPreviewFullscreen ? "top-6 right-6" : "top-10 right-10 md:top-12 md:right-12 lg:top-14 lg:right-14" // Adjust position
+                    )}
+                >
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleFullscreenPreview}
+                        className="rounded-full bg-card/70 hover:bg-card/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
+                        aria-label={isPreviewFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
                     >
-                        <Sparkles size={48} className="text-muted-foreground/50" />
-                        <p className="text-md sm:text-lg">Your generated website preview will appear here.</p>
-                    </motion.div>
-                 </motion.div>
-               )}
-             </AnimatePresence>
-           </div>
-        </ScrollArea>
-      </motion.div>
+                        {isPreviewFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+                    </Button>
+                </motion.div>
+            <ScrollArea className={cn(
+                "w-full h-full rounded-xl border border-border/50 bg-card/60 backdrop-blur-md shadow-inner transition-shadow hover:shadow-lg",
+                isPreviewFullscreen ? "rounded-none border-0 shadow-none" : ""
+             )}>
+                <div className="flex flex-col h-full p-1">
+                    <AnimatePresence mode="wait">
+                        {state?.code ? (
+                            <motion.div
+                                key={previewKey}
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                className="h-full flex-grow" // Ensure div takes full height
+                            >
+                                <LivePreview
+                                    html={state.code.html}
+                                    css={state.code.css}
+                                    javascript={state.code.javascript}
+                                    className="flex-grow w-full h-full bg-transparent" // Ensure LivePreview itself takes full height
+                                />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="placeholder"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
+                                className="flex flex-grow items-center justify-center text-muted-foreground text-center p-4"
+                            >
+                                <motion.div
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ scale: [0.8, 1.05, 1], opacity: 1 }}
+                                    transition={{ duration: 0.7, ease: 'backOut', delay: 0.5 }} // Added delay
+                                    className="flex flex-col items-center gap-2"
+                                >
+                                    <Sparkles size={48} className="text-muted-foreground/50" />
+                                    <p className="text-md sm:text-lg">Your generated website preview will appear here.</p>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </ScrollArea>
+        </motion.div>
 
-      {/* ChatBot Component */}
-      <ChatBot />
+
+      {/* ChatBot Component - Render outside fullscreen mode */}
+      <AnimatePresence>
+          {!isPreviewFullscreen && <ChatBot />}
+      </AnimatePresence>
     </div>
   );
 }
