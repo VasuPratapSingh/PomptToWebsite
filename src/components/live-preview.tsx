@@ -30,7 +30,7 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
       </head>
       <body>
         ${html}
-        <script>${javascript}<\/script> {# Escaping forward slash in script tag for safety #}
+        <script>${javascript}<\/script>
       </body>
       </html>
     `;
@@ -38,14 +38,22 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
   }, [html, css, javascript]);
 
   return (
-    // Ensure the container allows the iframe to take full height
-    <div className={cn("w-full h-full bg-transparent rounded-lg shadow-sm overflow-hidden", className)}> {/* Changed bg-card to bg-transparent */}
+    // Container to center the iframe and manage layout
+    <div className={cn("w-full h-full flex items-center justify-center bg-transparent p-2 overflow-hidden", className)}>
       <iframe
         srcDoc={iframeContent}
         title="Live Preview"
-        className="w-full h-full border-0 bg-transparent" // Added bg-transparent
-        sandbox="allow-scripts allow-same-origin" // Allow scripts but restrict some potentially harmful actions
-        allowtransparency="true" // Changed to lowercase as suggested by React warning
+        // Apply aspect ratio, control size, and style
+        className={cn(
+            "aspect-[9/16]", // Force 9:16 vertical aspect ratio
+            "h-full w-auto", // Let height dictate width based on aspect ratio
+            "max-h-full max-w-full", // Prevent exceeding container bounds
+            "border border-border/30 rounded-lg", // Consistent border and rounding
+            "bg-white", // White background for the preview content itself
+            "shadow-xl" // Enhanced shadow for better depth
+        )}
+        sandbox="allow-scripts allow-same-origin"
+        allowTransparency={true} // Use camelCase for React prop
       />
     </div>
   );

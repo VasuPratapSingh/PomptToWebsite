@@ -1,10 +1,11 @@
 
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useActionState } from "react"; // Import useActionState from react
-import { useFormStatus } from "react-dom"; // Keep useFormStatus from react-dom
-import { motion, AnimatePresence } from "framer-motion"; // Import framer-motion
+import { useActionState } from "react"; // Use react's useActionState
+import { useFormStatus } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,10 +15,10 @@ import { generateWebsiteAction } from "./actions";
 import { PromptSuggestions } from "@/components/prompt-suggestions";
 import { LivePreview } from "@/components/live-preview";
 import { ChatBot } from "@/components/chat-bot";
-import { Wand2, Download, Loader2, Sparkles, Mic, MicOff, Maximize, Minimize } from "lucide-react"; // Added Maximize, Minimize
+import { Wand2, Download, Loader2, Sparkles, Mic, MicOff, Maximize, Minimize } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import JSZip from 'jszip';
-import { saveAs } from 'file-saver'; // Import file-saver for download
+import { saveAs } from 'file-saver';
 import { cn } from "@/lib/utils";
 import { promptExamples } from "@/lib/prompt-examples";
 
@@ -438,11 +439,11 @@ export default function Home() {
                                                 {promptExamples.map((example, index) => (
                                                     <motion.div
                                                         key={index}
+                                                        initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                        transition={{ type: "spring", stiffness: 400, damping: 17, delay: 0.1 + index * 0.05 }} // Staggered spring animation
                                                         whileHover={{ scale: 1.05, y: -1, boxShadow: "0px 3px 10px hsla(var(--foreground)/0.1)" }}
                                                         whileTap={{ scale: 0.95, y: 0, boxShadow: "0px 1px 5px hsla(var(--foreground)/0.05)" }}
-                                                        transition={{ type: "spring", stiffness: 400, damping: 17, delay: 0.1 * index }} // Staggered delay
-                                                        className="animate-in fade-in slide-in-from-bottom-2 duration-300" // Added simple entrance animation
-                                                        style={{ animationDelay: `${index * 50}ms` }} // Staggered delay for entrance
                                                     >
                                                         <Button
                                                             variant="outline"
@@ -525,7 +526,7 @@ export default function Home() {
                                     html={state.code.html}
                                     css={state.code.css}
                                     javascript={state.code.javascript}
-                                    className="flex-grow w-full h-full bg-transparent" // Ensure LivePreview itself takes full height
+                                    // Removed className - handled inside LivePreview
                                 />
                             </motion.div>
                         ) : (
