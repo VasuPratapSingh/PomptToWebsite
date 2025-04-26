@@ -24,6 +24,8 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
         <style>
           /* Basic reset and ensure full height, transparent background */
           html, body { height: 100%; margin: 0; padding: 0; overflow: auto; font-family: sans-serif; background-color: transparent; }
+          /* Ensure content within body respects viewport */
+          body > * { max-width: 100%; box-sizing: border-box; }
           ${css}
         </style>
         <title>Live Preview</title>
@@ -39,7 +41,10 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
 
   return (
     // Container to center the iframe and manage layout
-    <div className={cn("w-full h-full flex items-center justify-center bg-transparent p-2 overflow-hidden", className)}>
+    <div className={cn(
+        "w-full h-full flex items-center justify-center bg-transparent p-1 sm:p-2 overflow-hidden", // Reduced padding slightly
+        className
+    )}>
       <iframe
         srcDoc={iframeContent}
         title="Live Preview"
@@ -47,13 +52,13 @@ export function LivePreview({ html, css, javascript, className }: LivePreviewPro
         className={cn(
             "aspect-[9/16]", // Force 9:16 vertical aspect ratio
             "h-full w-auto", // Let height dictate width based on aspect ratio
-            "max-h-full max-w-full", // Prevent exceeding container bounds
-            "border border-border/30 rounded-lg", // Consistent border and rounding
+            "max-h-full max-w-[calc(100%-0.5rem)]", // Prevent exceeding container bounds, slightly reduced max-width for padding
+            "border border-border/30 rounded-md sm:rounded-lg", // Adjusted rounding for smaller screens
             "bg-white", // White background for the preview content itself
-            "shadow-xl" // Enhanced shadow for better depth
+            "shadow-lg sm:shadow-xl" // Adjusted shadow for smaller screens
         )}
         sandbox="allow-scripts allow-same-origin"
-        allowTransparency={true} // Use camelCase for React prop
+        // allowTransparency prop removed as it's deprecated/non-standard
       />
     </div>
   );

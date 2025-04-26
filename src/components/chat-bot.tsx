@@ -40,7 +40,7 @@ export function ChatBot() {
                 animate={{ opacity: 1, y: 0 }} // Animate to visible and on-screen
                 exit={{ opacity: 0, y: 50 }} // Animate out
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="fixed bottom-6 right-6 z-50" // Ensure positioning
+                className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50" // Adjusted positioning for small screens
             >
                 <Popover open={isOpen} onOpenChange={setIsOpen}>
                     <PopoverTrigger asChild>
@@ -51,17 +51,17 @@ export function ChatBot() {
                             <Button
                                 variant="default" // Use primary color
                                 size="icon"
-                                className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center bg-gradient-to-br from-primary to-accent hover:from-primary/90 hover:to-accent/90" // Added gradient
+                                className="rounded-full w-12 h-12 sm:w-14 sm:w-14 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center bg-gradient-to-br from-primary to-accent hover:from-primary/90 hover:to-accent/90" // Adjusted size for small screens
                                 aria-label="Toggle Chat Bot"
                             >
                                 <AnimatePresence mode="wait">
                                     {isOpen ? (
                                         <motion.div key="close" initial={{ rotate: -90, scale: 0 }} animate={{ rotate: 0, scale: 1 }} exit={{ rotate: 90, scale: 0 }}>
-                                            <X className="h-6 w-6" />
+                                            <X className="h-5 w-5 sm:h-6 sm:w-6" /> {/* Adjusted icon size */}
                                         </motion.div>
                                     ) : (
                                         <motion.div key="open" initial={{ rotate: 90, scale: 0 }} animate={{ rotate: 0, scale: 1 }} exit={{ rotate: -90, scale: 0 }}>
-                                            <MessageSquare className="h-6 w-6" />
+                                            <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" /> {/* Adjusted icon size */}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -71,8 +71,8 @@ export function ChatBot() {
                     <PopoverContent
                         side="top"
                         align="end"
-                        className="w-80 md:w-96 p-0 border-none shadow-xl rounded-xl bg-transparent backdrop-blur-xl mr-2 mb-1" // Align popover slightly off the button
-                        sideOffset={10} // Add space between trigger and popover
+                        className="w-72 sm:w-80 md:w-96 p-0 border-none shadow-xl rounded-xl bg-transparent backdrop-blur-xl mr-1 mb-1 sm:mr-2 sm:mb-1" // Adjusted width and margins
+                        sideOffset={8} // Adjusted offset slightly
                     >
                         <AnimatePresence>
                             {isOpen && (
@@ -84,21 +84,21 @@ export function ChatBot() {
                                 >
                                     {/* Use Card for structure and consistent styling */}
                                     <Card className="border-none bg-card/80 backdrop-blur-md overflow-hidden rounded-xl">
-                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-4 px-4 border-b bg-card/90">
-                                            <div className="flex items-center gap-2">
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-3 px-3 sm:pb-2 sm:pt-4 sm:px-4 border-b bg-card/90"> {/* Adjusted padding */}
+                                            <div className="flex items-center gap-1.5 sm:gap-2"> {/* Adjusted gap */}
                                                 <motion.div animate={{ rotate: [0, -10, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
-                                                    <Bot className="h-5 w-5 text-primary" />
+                                                    <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /> {/* Adjusted icon size */}
                                                 </motion.div>
-                                                <CardTitle className="text-lg font-semibold">Help Bot</CardTitle>
+                                                <CardTitle className="text-base sm:text-lg font-semibold">Help Bot</CardTitle> {/* Adjusted text size */}
                                             </div>
-                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsOpen(false)}>
-                                                <X className="h-4 w-4" />
+                                            <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7" onClick={() => setIsOpen(false)}> {/* Adjusted size */}
+                                                <X className="h-3 w-3 sm:h-4 sm:w-4" /> {/* Adjusted icon size */}
                                                 <span className="sr-only">Close chat</span>
                                             </Button>
                                         </CardHeader>
                                         <CardContent className="p-0">
-                                            <ScrollArea className="h-72 p-4">
-                                                <div className="space-y-4">
+                                            <ScrollArea className="h-64 sm:h-72 p-3 sm:p-4"> {/* Adjusted height and padding */}
+                                                <div className="space-y-3 sm:space-y-4"> {/* Adjusted spacing */}
                                                     {messages.map((message, index) => (
                                                         <motion.div
                                                             key={index}
@@ -106,7 +106,7 @@ export function ChatBot() {
                                                             animate={{ opacity: 1, x: 0 }}
                                                             transition={{ duration: 0.3, delay: index * 0.1 }}
                                                             className={cn(
-                                                                "flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm shadow-sm", // Added shadow-sm
+                                                                "flex w-max max-w-[80%] sm:max-w-[75%] flex-col gap-1 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm shadow-sm", // Adjusted max-width, padding, text size, gap
                                                                 message.sender === 'user'
                                                                     ? "ml-auto bg-primary text-primary-foreground"
                                                                     : "bg-muted"

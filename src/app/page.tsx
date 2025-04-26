@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useActionState } from "react"; // Use react's useActionState
-import { useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom"; // Keep useFormStatus from react-dom
 import { motion, AnimatePresence } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ function SubmitButton() {
         type="submit"
         disabled={pending}
         aria-disabled={pending}
-        className="w-full sm:w-auto transition-all duration-300 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))] hover:from-[hsl(var(--primary)/0.9)] hover:to-[hsl(var(--accent)/0.9)] text-primary-foreground"
+        className="w-full sm:w-auto transition-all duration-300 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))] hover:from-[hsl(var(--primary)/0.9)] hover:to-[hsl(var(--accent)/0.9)] text-primary-foreground px-4 py-2 text-sm sm:text-base" // Adjusted padding/text size
       >
         {pending ? (
           <>
@@ -115,7 +115,7 @@ function DownloadButton({ code }: { code: { html: string, css: string, javascrip
             <Button
                 variant="outline"
                 onClick={handleDownload}
-                className="w-full sm:w-auto transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg"
+                className="w-full sm:w-auto transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg px-4 py-2 text-sm sm:text-base" // Adjusted padding/text size
                 aria-label="Download website code as ZIP"
             >
                  <motion.div
@@ -323,14 +323,14 @@ export default function Home() {
             <motion.div
                 initial={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50, transition: { duration: 0.3 } }}
-                className="w-full md:w-1/2 h-full md:max-h-screen" // Ensure h-full
+                className="w-full md:w-1/2 lg:w-2/5 xl:w-1/3 h-full md:max-h-screen overflow-y-auto md:overflow-y-hidden" // Adjusted widths for different screens, allow vertical scroll on small screens
             >
                 <ScrollArea className="h-full"> {/* Ensure ScrollArea takes full height */}
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, ease: "easeOut" }}
-                        className="p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col min-h-full" // min-h-full to allow stretching
+                        className="p-4 sm:p-6 lg:p-8 flex flex-col min-h-full" // Adjusted padding, min-h-full to allow stretching
                     >
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -339,33 +339,33 @@ export default function Home() {
                             className="flex flex-col flex-grow" // Ensure this div grows
                         >
                             <Card className="flex flex-col flex-grow overflow-hidden shadow-lg rounded-xl backdrop-blur-md bg-card/70 border border-border/50 transition-all duration-300 hover:shadow-xl">
-                                <CardHeader className="flex-shrink-0 pb-4">
-                                    <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl md:text-3xl font-bold">
+                                <CardHeader className="flex-shrink-0 pb-2 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6"> {/* Adjusted padding */}
+                                    <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl font-bold"> {/* Adjusted text size */}
                                         <motion.div
                                             animate={{ rotate: [0, 15, -10, 15, 0], scale: [1, 1.1, 1, 1.1, 1] }}
-                                            transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror", delay: 0.5 }} // Added delay
+                                            transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror", delay: 0.5 }}
                                         >
-                                            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                                            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /> {/* Adjusted icon size */}
                                         </motion.div>
                                         PromptToSite
                                     </CardTitle>
-                                    <CardDescription className="text-sm sm:text-base md:text-lg">Describe the website you want to create, or try a preset.</CardDescription>
+                                    <CardDescription className="text-xs sm:text-sm md:text-base">Describe the website you want to create, or try a preset.</CardDescription> {/* Adjusted text size */}
                                 </CardHeader>
-                                <CardContent className="flex flex-col flex-grow gap-4 p-4 md:p-6 pt-0">
-                                    <form action={formAction} ref={formRef} className="flex flex-col flex-grow gap-4">
+                                <CardContent className="flex flex-col flex-grow gap-3 sm:gap-4 p-4 sm:p-6 pt-0"> {/* Adjusted padding and gap */}
+                                    <form action={formAction} ref={formRef} className="flex flex-col flex-grow gap-3 sm:gap-4"> {/* Adjusted gap */}
                                         <motion.div
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.3, delay: 0.2 }}
-                                            className="flex flex-col flex-grow gap-1.5 relative"
+                                            className="flex flex-col flex-grow gap-1 sm:gap-1.5 relative" // Adjusted gap
                                         >
-                                            <Label htmlFor="prompt" className="text-md sm:text-lg font-semibold">Your Prompt</Label>
+                                            <Label htmlFor="prompt" className="text-sm sm:text-base md:text-lg font-semibold">Your Prompt</Label> {/* Adjusted text size */}
                                             <div className="relative flex-grow flex items-start"> {/* Use flex to align items */}
                                                 <Textarea
                                                     id="prompt"
                                                     name="prompt"
-                                                    placeholder="e.g., Create a sleek landing page for a mobile app promoting sustainable travel..."
-                                                    className="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] flex-grow resize-none text-base rounded-lg shadow-inner bg-input/80 backdrop-blur-sm transition-shadow focus:shadow-md focus:ring-2 focus:ring-ring/50 pr-12" // Added padding-right for mic button
+                                                    placeholder="e.g., Create a sleek landing page for a mobile app..." // Shortened placeholder for small screens
+                                                    className="min-h-[120px] sm:min-h-[150px] md:min-h-[200px] lg:min-h-[250px] flex-grow resize-none text-sm sm:text-base rounded-lg shadow-inner bg-input/80 backdrop-blur-sm transition-shadow focus:shadow-md focus:ring-2 focus:ring-ring/50 pr-10 sm:pr-12" // Adjusted min-height, text size, padding-right
                                                     value={promptValue}
                                                     onChange={handleInputChange}
                                                     onFocus={handleTextareaFocus}
@@ -379,7 +379,7 @@ export default function Home() {
                                                         initial={{ opacity: 0, scale: 0.8 }}
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         transition={{ delay: 0.5 }}
-                                                        className="absolute top-2 right-2" // Position top-right
+                                                        className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2" // Adjusted position
                                                     >
                                                         <Button
                                                             type="button"
@@ -387,12 +387,12 @@ export default function Home() {
                                                             size="icon"
                                                             onClick={handleToggleRecording}
                                                             className={cn(
-                                                                "rounded-full transition-colors duration-200",
+                                                                "rounded-full h-7 w-7 sm:h-8 sm:w-8 transition-colors duration-200", // Adjusted size
                                                                 isRecording ? "bg-red-500/80 hover:bg-red-600/80 text-white animate-pulse" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                                                             )}
                                                             aria-label={isRecording ? "Stop recording" : "Start recording"}
                                                         >
-                                                            {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                                                            {isRecording ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />} {/* Adjusted icon size */}
                                                         </Button>
                                                     </motion.div>
                                                 )}
@@ -404,7 +404,7 @@ export default function Home() {
                                                             exit={{ opacity: 0, y: -10, scale: 0.98 }}
                                                             transition={{ duration: 0.2 }}
                                                             className="absolute z-10 mt-1 w-full top-full" // Position below textarea
-                                                            style={{ maxWidth: 'calc(100% - 2rem)' }} // Prevent overflow on smaller screens
+                                                            style={{ maxWidth: 'calc(100% - 1rem)' }} // Adjusted max width
                                                         >
                                                             <PromptSuggestions
                                                                 inputValue={promptValue}
@@ -420,7 +420,7 @@ export default function Home() {
                                                     initial={{ opacity: 0, y: 5 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     id="prompt-error"
-                                                    className="text-sm font-medium text-destructive"
+                                                    className="text-xs sm:text-sm font-medium text-destructive" // Adjusted text size
                                                 >
                                                     {state.errors.prompt[0]}
                                                 </motion.p>
@@ -432,10 +432,10 @@ export default function Home() {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.3, delay: 0.3 }}
-                                            className="mt-4 flex-shrink-0"
+                                            className="mt-3 sm:mt-4 flex-shrink-0" // Adjusted margin
                                         >
-                                            <Label className="text-sm sm:text-base font-medium mb-2 block">Try these examples:</Label>
-                                            <div className="flex flex-wrap gap-2">
+                                            <Label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Try these examples:</Label> {/* Adjusted text size and margin */}
+                                            <div className="flex flex-wrap gap-1.5 sm:gap-2"> {/* Adjusted gap */}
                                                 {promptExamples.map((example, index) => (
                                                     <motion.div
                                                         key={index}
@@ -449,10 +449,10 @@ export default function Home() {
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => handlePresetClick(example)}
-                                                            className="transition-all duration-150 ease-in-out text-xs sm:text-sm shadow-sm hover:shadow backdrop-blur-sm bg-background/60 hover:bg-accent/20" // Hover effect
+                                                            className="transition-all duration-150 ease-in-out text-[10px] sm:text-xs shadow-sm hover:shadow backdrop-blur-sm bg-background/60 hover:bg-accent/20 px-2 py-1 sm:px-3" // Adjusted text size and padding
                                                             aria-label={`Use preset prompt: ${example}`}
                                                         >
-                                                            {example.length > 40 ? `${example.substring(0, 37)}...` : example}
+                                                            {example.length > 30 ? `${example.substring(0, 27)}...` : example} {/* Shortened text further */}
                                                         </Button>
                                                     </motion.div>
                                                 ))}
@@ -460,7 +460,7 @@ export default function Home() {
                                         </motion.div>
 
                                         {/* Buttons container at the bottom */}
-                                        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-start items-center mt-auto pt-4 border-t border-border/50 flex-shrink-0">
+                                        <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 justify-start items-center mt-auto pt-3 sm:pt-4 border-t border-border/50 flex-shrink-0"> {/* Adjusted gap, padding */}
                                             <SubmitButton />
                                             <DownloadButton code={state?.code} />
                                         </div>
@@ -481,8 +481,8 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut", delay: isPreviewFullscreen ? 0 : 0.2 }} // Adjust delay based on fullscreen
                 className={cn(
-                    "w-full md:max-h-screen flex flex-col relative transition-all duration-300 ease-in-out h-full", // Ensure h-full
-                    isPreviewFullscreen ? "md:w-full fixed inset-0 z-40 p-0" : "md:w-1/2 p-4 sm:p-6 md:p-8 lg:p-10"
+                    "w-full md:w-1/2 lg:w-3/5 xl:w-2/3 md:max-h-screen flex flex-col relative transition-all duration-300 ease-in-out h-full", // Adjusted widths, ensure h-full
+                    isPreviewFullscreen ? "md:w-full fixed inset-0 z-40 p-0" : "p-4 sm:p-6 lg:p-8" // Adjusted padding
                 )}
             >
              {/* Fullscreen Toggle Button */}
@@ -491,8 +491,8 @@ export default function Home() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 }}
                     className={cn(
-                        "absolute top-6 right-6 z-50",
-                        isPreviewFullscreen ? "top-6 right-6" : "top-10 right-10 md:top-12 md:right-12 lg:top-14 lg:right-14" // Adjust position
+                        "absolute top-4 right-4 sm:top-6 sm:right-6 z-50", // Adjusted position
+                        isPreviewFullscreen ? "top-4 right-4 sm:top-6 sm:right-6" : "top-6 right-6 md:top-8 md:right-8 lg:top-10 lg:right-10" // Further adjusted position
                     )}
                 >
                     <Button
@@ -500,10 +500,10 @@ export default function Home() {
                         variant="ghost"
                         size="icon"
                         onClick={toggleFullscreenPreview}
-                        className="rounded-full bg-card/70 hover:bg-card/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
+                        className="rounded-full h-8 w-8 sm:h-9 sm:w-9 bg-card/70 hover:bg-card/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all" // Adjusted size
                         aria-label={isPreviewFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
                     >
-                        {isPreviewFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+                        {isPreviewFullscreen ? <Minimize className="h-4 w-4 sm:h-5 sm:w-5" /> : <Maximize className="h-4 w-4 sm:h-5 sm:w-5" />} {/* Adjusted icon size */}
                     </Button>
                 </motion.div>
             <ScrollArea className={cn(
@@ -526,7 +526,7 @@ export default function Home() {
                                     html={state.code.html}
                                     css={state.code.css}
                                     javascript={state.code.javascript}
-                                    // Removed className - handled inside LivePreview
+                                    // className adjusted inside LivePreview
                                 />
                             </motion.div>
                         ) : (
@@ -544,8 +544,8 @@ export default function Home() {
                                     transition={{ duration: 0.7, ease: 'backOut', delay: 0.5 }} // Added delay
                                     className="flex flex-col items-center gap-2"
                                 >
-                                    <Sparkles size={48} className="text-muted-foreground/50" />
-                                    <p className="text-md sm:text-lg">Your generated website preview will appear here.</p>
+                                    <Sparkles size={36} className="text-muted-foreground/50 sm:size-48" /> {/* Adjusted size */}
+                                    <p className="text-sm sm:text-base md:text-lg">Your generated website preview will appear here.</p> {/* Adjusted text size */}
                                 </motion.div>
                             </motion.div>
                         )}
