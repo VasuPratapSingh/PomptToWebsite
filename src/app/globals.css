@@ -2,82 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes gradient-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 body {
   font-family: var(--font-geist-sans), sans-serif;
+  /* Apply animated gradient background */
+  background: linear-gradient(-45deg, hsl(220 20% 96%), hsl(210 40% 94%), hsl(180 30% 92%), hsl(220 20% 96%));
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
 }
+
+.dark body {
+   /* Apply animated gradient background for dark mode */
+  background: linear-gradient(-45deg, hsl(220 10% 12%), hsl(210 20% 15%), hsl(180 15% 18%), hsl(220 10% 12%));
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
 
 @layer base {
   :root {
-    /* Light Theme - Neutral Grays, Light Blue Secondary, Teal Accent */
-    --background: 220 20% 98%; /* Lighter Gray */
+    /* Light Theme - Adjusted for transparency */
+    --background: 220 20% 98% / 0.6; /* Base background with some transparency */
     --foreground: 220 10% 10%; /* Darker Gray */
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 220 10% 10%; /* Darker Gray */
-    --popover: 0 0% 100%; /* White */
-    --popover-foreground: 220 10% 10%; /* Darker Gray */
+    --card: 0 0% 100% / 0.7; /* Card with more transparency */
+    --card-foreground: 220 10% 10%;
+    --popover: 0 0% 100% / 0.9; /* Popover less transparent */
+    --popover-foreground: 220 10% 10%;
     --primary: 180 100% 25%; /* Teal Accent */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 210 40% 96.1%; /* Light Blue */
-    --secondary-foreground: 210 40% 10%; /* Darker Blue */
-    --muted: 220 20% 94%; /* Gray */
-    --muted-foreground: 220 10% 45%; /* Mid Gray */
-    --accent: 180 100% 25%; /* Teal Accent */
-    --accent-foreground: 0 0% 100%; /* White */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1% / 0.8; /* Light Blue with transparency */
+    --secondary-foreground: 210 40% 10%;
+    --muted: 220 20% 94% / 0.7; /* Gray with transparency */
+    --muted-foreground: 220 10% 45%;
+    --accent: 180 100% 25% / 0.9; /* Teal Accent slightly transparent */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 88%; /* Light Gray Border */
-    --input: 220 15% 88%; /* Light Gray Input */
-    --ring: 180 100% 25%; /* Teal Accent for focus rings */
+    --border: 220 15% 88% / 0.5; /* Lighter Border */
+    --input: 220 15% 95% / 0.6; /* Slightly less transparent input */
+    --ring: 180 100% 25%;
     --chart-1: 180 100% 35%;
     --chart-2: 210 80% 50%;
     --chart-3: 220 10% 50%;
     --chart-4: 180 60% 60%;
     --chart-5: 210 50% 70%;
     --radius: 0.5rem;
-    --sidebar-background: 220 15% 95%; /* Slightly darker gray for sidebar */
+    --sidebar-background: 220 15% 95% / 0.8;
     --sidebar-foreground: 220 10% 20%;
-    --sidebar-primary: 180 100% 25%; /* Teal */
+    --sidebar-primary: 180 100% 25%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 100% 30%; /* Slightly lighter teal */
+    --sidebar-accent: 180 100% 30% / 0.9;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 15% 85%;
+    --sidebar-border: 220 15% 85% / 0.6;
     --sidebar-ring: 180 100% 25%;
   }
 
   .dark {
-    /* Dark Theme - Neutral Grays, Light Blue Secondary, Teal Accent */
-    --background: 220 10% 10%; /* Dark Gray */
+    /* Dark Theme - Adjusted for transparency */
+    --background: 220 10% 10% / 0.6; /* Base background with some transparency */
     --foreground: 220 10% 95%; /* Light Gray */
-    --card: 220 10% 15%; /* Slightly lighter dark gray */
-    --card-foreground: 220 10% 95%; /* Light Gray */
-    --popover: 220 10% 10%; /* Dark Gray */
-    --popover-foreground: 220 10% 95%; /* Light Gray */
+    --card: 220 10% 15% / 0.7; /* Card with more transparency */
+    --card-foreground: 220 10% 95%;
+    --popover: 220 10% 10% / 0.9; /* Popover less transparent */
+    --popover-foreground: 220 10% 95%;
     --primary: 180 100% 35%; /* Brighter Teal Accent */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 210 40% 20%; /* Dark Blue */
-    --secondary-foreground: 210 40% 90%; /* Lighter Blue */
-    --muted: 220 10% 25%; /* Mid-Dark Gray */
-    --muted-foreground: 220 10% 65%; /* Mid Gray */
-    --accent: 180 100% 35%; /* Brighter Teal Accent */
-    --accent-foreground: 0 0% 100%; /* White */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 20% / 0.8; /* Dark Blue with transparency */
+    --secondary-foreground: 210 40% 90%;
+    --muted: 220 10% 25% / 0.7; /* Mid-Dark Gray with transparency */
+    --muted-foreground: 220 10% 65%;
+    --accent: 180 100% 35% / 0.9; /* Brighter Teal Accent slightly transparent */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 10% 30%; /* Dark Gray Border */
-    --input: 220 10% 30%; /* Dark Gray Input */
-    --ring: 180 100% 35%; /* Brighter Teal Accent for focus rings */
+    --border: 220 10% 30% / 0.5; /* Lighter Border */
+    --input: 220 10% 25% / 0.6; /* Slightly less transparent input */
+    --ring: 180 100% 35%;
     --chart-1: 180 100% 45%;
     --chart-2: 210 80% 60%;
     --chart-3: 220 10% 60%;
     --chart-4: 180 60% 70%;
     --chart-5: 210 50% 80%;
-    --sidebar-background: 220 10% 12%; /* Slightly darker gray for sidebar */
+    --sidebar-background: 220 10% 12% / 0.8;
     --sidebar-foreground: 220 10% 80%;
-    --sidebar-primary: 180 100% 35%; /* Teal */
+    --sidebar-primary: 180 100% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 100% 40%; /* Slightly lighter teal */
+    --sidebar-accent: 180 100% 40% / 0.9;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 10% 25%;
+    --sidebar-border: 220 10% 25% / 0.6;
     --sidebar-ring: 180 100% 35%;
+    --radius: 0.5rem;
   }
 }
 
@@ -85,8 +104,9 @@ body {
   * {
     @apply border-border;
   }
+  /* Remove background application from body here as it's handled above */
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+     @apply text-foreground;
+     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
