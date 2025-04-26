@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -14,6 +15,7 @@ import { LivePreview } from "@/components/live-preview";
 import { Wand2, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import JSZip from 'jszip';
+import { cn } from "@/lib/utils"; // Import cn
 
 const initialState = {
   message: null,
@@ -24,7 +26,12 @@ const initialState = {
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} aria-disabled={pending} className="w-full sm:w-auto">
+    <Button
+        type="submit"
+        disabled={pending}
+        aria-disabled={pending}
+        className="w-full sm:w-auto transition-transform transform hover:scale-105 active:scale-95"
+      >
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
@@ -66,7 +73,11 @@ function DownloadButton({ code }: { code: { html: string, css: string, javascrip
   if (!code?.html) return null;
 
   return (
-    <Button variant="outline" onClick={handleDownload} className="w-full sm:w-auto">
+    <Button
+        variant="outline"
+        onClick={handleDownload}
+        className="w-full sm:w-auto transition-transform transform hover:scale-105 active:scale-95"
+      >
       <Download className="mr-2 h-4 w-4" /> Download Code
     </Button>
   );
@@ -118,8 +129,8 @@ export default function Home() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-background">
       {/* Left Panel: Prompt Input */}
-      <div className="w-full md:w-1/2 md:max-h-screen p-4 md:p-6 flex flex-col border-r border-border">
-         <Card className="flex flex-col flex-grow overflow-hidden shadow-md">
+      <div className="w-full md:w-1/2 md:max-h-screen p-4 md:p-6 lg:p-8 flex flex-col border-r border-border">
+         <Card className="flex flex-col flex-grow overflow-hidden shadow-md transition-shadow hover:shadow-lg rounded-xl">
           <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl">
               <Wand2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -136,7 +147,7 @@ export default function Home() {
                     id="prompt"
                     name="prompt"
                     placeholder="e.g., Create a simple portfolio website for a photographer..."
-                    className="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] w-full resize-none text-sm sm:text-base" // Ensure text area grows
+                    className="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] w-full resize-none text-sm sm:text-base rounded-lg" // Ensure text area grows
                     value={promptValue}
                     onChange={handleInputChange}
                     onFocus={handleTextareaFocus}
@@ -167,18 +178,20 @@ export default function Home() {
       </div>
 
       {/* Right Panel: Live Preview */}
-      <div className="w-full md:w-1/2 md:max-h-screen p-4 md:p-6 flex">
+      <div className="w-full md:w-1/2 md:max-h-screen p-4 md:p-6 lg:p-8 flex">
         {/* Ensure ScrollArea takes full height of its container */}
-        <ScrollArea className="w-full h-full rounded-lg border bg-card shadow-inner">
+        <ScrollArea className="w-full h-full rounded-xl border bg-card shadow-inner transition-shadow hover:shadow-lg">
            {/* Use flexbox to manage preview/placeholder height */}
            <div className="flex flex-col h-full p-1">
               {state?.code ? (
-                  <LivePreview
-                    html={state.code.html}
-                    css={state.code.css}
-                    javascript={state.code.javascript}
-                    className="flex-grow w-full" // Allow preview to grow
-                  />
+                  <div className="animate-in fade-in duration-500 h-full"> {/* Added animation here */}
+                    <LivePreview
+                        html={state.code.html}
+                        css={state.code.css}
+                        javascript={state.code.javascript}
+                        className="flex-grow w-full" // Allow preview to grow
+                    />
+                  </div>
               ) : (
                 <div className="flex flex-grow items-center justify-center text-muted-foreground text-center p-4">
                     <p>Your generated website preview will appear here.</p>
