@@ -313,7 +313,7 @@ export default function Home() {
 
   return (
     <div className={cn(
-        "relative flex flex-col md:flex-row min-h-screen overflow-hidden transition-all duration-300 ease-in-out",
+        "relative flex flex-col md:flex-row min-h-screen h-screen max-h-screen overflow-hidden transition-all duration-300 ease-in-out", // Ensure h-screen and max-h-screen
         isPreviewFullscreen ? "bg-background" : "" // Adjust background for fullscreen
     )}>
         {/* Left Panel: Prompt Input */}
@@ -322,14 +322,14 @@ export default function Home() {
             <motion.div
                 initial={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50, transition: { duration: 0.3 } }}
-                className="w-full md:w-1/2 md:max-h-screen"
+                className="w-full md:w-1/2 h-full md:max-h-screen" // Ensure h-full
             >
-                <ScrollArea className="h-full">
+                <ScrollArea className="h-full"> {/* Ensure ScrollArea takes full height */}
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, ease: "easeOut" }}
-                        className="p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col min-h-full"
+                        className="p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col min-h-full" // min-h-full to allow stretching
                     >
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -480,7 +480,7 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut", delay: isPreviewFullscreen ? 0 : 0.2 }} // Adjust delay based on fullscreen
                 className={cn(
-                    "w-full md:max-h-screen flex flex-col relative transition-all duration-300 ease-in-out",
+                    "w-full md:max-h-screen flex flex-col relative transition-all duration-300 ease-in-out h-full", // Ensure h-full
                     isPreviewFullscreen ? "md:w-full fixed inset-0 z-40 p-0" : "md:w-1/2 p-4 sm:p-6 md:p-8 lg:p-10"
                 )}
             >
@@ -509,7 +509,8 @@ export default function Home() {
                 "w-full h-full rounded-xl border border-border/50 bg-card/60 backdrop-blur-md shadow-inner transition-shadow hover:shadow-lg",
                 isPreviewFullscreen ? "rounded-none border-0 shadow-none" : ""
              )}>
-                <div className="flex flex-col h-full p-1">
+                {/* Ensure inner div takes full height */}
+                <div className="flex flex-col h-full p-1 min-h-0"> {/* Added min-h-0 to prevent infinite height issues */}
                     <AnimatePresence mode="wait">
                         {state?.code ? (
                             <motion.div
@@ -534,7 +535,7 @@ export default function Home() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.3 }}
-                                className="flex flex-grow items-center justify-center text-muted-foreground text-center p-4"
+                                className="flex flex-grow items-center justify-center h-full text-muted-foreground text-center p-4" // Ensure h-full
                             >
                                 <motion.div
                                     initial={{ scale: 0.8, opacity: 0 }}
