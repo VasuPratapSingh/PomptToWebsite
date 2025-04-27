@@ -15,6 +15,3 @@
 - Simple and clear icons for actions like "Generate" and "Download."
 - Split-screen layout with the prompt input on one side and the live preview on the other.
 
-## Original User Request:
-An app that can generate fully functional websites in a single prompt with proper helping prompt in prompt bar like google helping sections in drop down areaMake
-  
